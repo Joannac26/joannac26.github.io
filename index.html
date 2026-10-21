@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>人生卡牌 · 桃花坞同款</title>
+<style>
+  :root {
+    --bg1: #fdf6ec; --bg2: #f7e6d3;
+    --ink: #5b4636; --ink2: #8a6f58;
+    --accent: #e8807f; --accent2: #f4a7b9;
+    --green: #7fb069; --blue: #6fa8dc; --purple: #9b8bd6; --orange: #f0a35e;
+    --card-bg: #fffdf8; --shadow: 0 6px 18px rgba(120,90,60,.12);
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", system-ui, sans-serif;
+    background: linear-gradient(160deg, var(--bg1), var(--bg2));
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 24px;
+  }
+  .deco { position: fixed; font-size: 40px; opacity: .18; pointer-events: none; z-index: 0; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 20px 16px; position: relative; z-index: 1; }
+
+  header.top { text-align: center; margin-bottom: 18px; }
+  header.top h1 { font-size: 30px; letter-spacing: 2px; }
+  header.top h1 .sub { font-size: 14px; color: var(--ink2); display: block; letter-spacing: 1px; margin-top: 6px; font-weight: normal; }
+  .badge { display: inline-block; background: #fff; border: 1px solid #e8d5c0; color: var(--ink2); border-radius: 999px; padding: 3px 12px; font-size: 12px; margin-top: 10px; }
+
+  .card {
+    background: var(--card-bg); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px;
+  }
+  .card h2 { font-size: 18px; margin-bottom: 12px; }
+  .muted { color: var(--ink2); font-size: 13px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .col { display: flex; flex-direction: column; gap: 10px; }
+
+  input[type=text], input[type=number] {
+    flex: 1; min-width: 140px; border: 1.5px solid #e2cdb6; border-radius: 12px;
+    padding: 12px 14px; font-size: 15px; background: #fff; color: var(--ink); outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border: none; border-radius: 12px; padding: 12px 22px; font-size: 15px; cursor: pointer;
+    background: var(--accent); color: #fff; font-weight: 600; transition: transform .1s, box-shadow .15s, opacity .15s;
+    box-shadow: 0 4px 12px rgba(232,128,127,.35); white-space: nowrap;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .btn.ghost { background: #fff; color: var(--accent); border: 1.5px solid var(--accent); box-shadow: none; }
+  .btn.green { background: var(--green); box-shadow: 0 4px 12px rgba(127,176,105,.35); }
+  .btn.blue { background: var(--blue); box-shadow: 0 4px 12px rgba(111,168,220,.35); }
+  .btn.purple { background: var(--purple); box-shadow: 0 4px 12px rgba(155,139,214,.35); }
+  .btn.small { padding: 8px 14px; font-size: 13px; border-radius: 10px; }
+  .btn.big { padding: 14px 30px; font-size: 17px; border-radius: 16px; }
+
+  /* ---------- 启动页 ---------- */
+  .start-hero { text-align: center; padding: 34px 20px 26px; }
+  .start-hero .big-icon { font-size: 64px; }
+  .start-hero p { color: var(--ink2); margin-top: 10px; line-height: 1.7; }
+  .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 16px; }
+  .mode-card {
+    background: #fff; border: 2px solid #f0e0cd; border-radius: var(--radius); padding: 18px;
+    cursor: pointer; transition: all .15s; text-align: left;
+  }
+  .mode-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .mode-card h3 { font-size: 16px; margin-bottom: 6px; }
+  .mode-card p { font-size: 13px; color: var(--ink2); line-height: 1.6; }
+  .mode-card .emoji { font-size: 26px; margin-right: 6px; }
+
+  .rules { font-size: 13.5px; color: var(--ink2); line-height: 1.9; }
+  .rules b { color: var(--ink); }
+  .rules ul { padding-left: 18px; }
+
+  /* ---------- 房间 ---------- */
+  .room-code {
+    font-size: 34px; font-weight: 800; letter-spacing: 6px; color: var(--accent);
+    background: #fff3f0; border: 2px dashed #f3c2bf; border-radius: 14px;
+    padding: 10px 18px; display: inline-block; margin: 6px 0 4px;
+  }
+  .player-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+  .player-chip {
+    display: inline-flex; align-items: center; gap: 8px; background: #fff;
+    border: 2px solid #f0e0cd; border-radius: 999px; padding: 7px 14px; font-size: 14px;
+    transition: all .15s; cursor: default;
+  }
+  .player-chip .dot { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 15px; color: #fff; }
+  .player-chip.host { border-color: var(--accent); }
+  .player-chip.offline { opacity: .5; }
+  .player-chip .crown { font-size: 12px; }
+  .player-chip button { border: none; background: none; color: var(--ink2); cursor: pointer; font-size: 14px; padding: 0 2px; }
+
+  /* ---------- 卡牌 ---------- */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .life-card {
+    background: #fff; border: 2px solid #efe0cd; border-radius: 14px; padding: 12px 8px;
+    text-align: center; cursor: pointer; transition: all .15s; position: relative; min-height: 118px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .life-card .ic { font-size: 30px; }
+  .life-card .nm { font-size: 14.5px; font-weight: 700; }
+  .life-card .ds { font-size: 11px; color: var(--ink2); line-height: 1.4; }
+  .life-card .colorbar { position: absolute; top: 0; left: 8px; right: 8px; height: 5px; border-radius: 0 0 6px 6px; }
+  .life-card.selected {
+    border-color: var(--accent); transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(232,128,127,.28); background: #fff8f6;
+  }
+  .life-card.selected::after {
+    content: "✓"; position: absolute; top: 4px; right: 8px; color: #fff; font-weight: 800;
+    background: var(--accent); border-radius: 50%; width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+  }
+  .life-card.dim { opacity: .45; cursor: default; }
+  .life-card.small { min-height: 84px; padding: 8px 4px; cursor: default; }
+  .life-card.small .ic { font-size: 22px; }
+  .life-card.small .nm { font-size: 12px; }
+  .life-card.small .ds { display: none; }
+
+  /* ---------- 挫折 ---------- */
+  .setback-hero {
+    background: linear-gradient(135deg, #7d5a8f, #a2648f); color: #fff; border-radius: var(--radius);
+    padding: 26px 20px; text-align: center; box-shadow: 0 10px 24px rgba(125,90,143,.35);
+  }
+  .setback-hero .phase-tag { font-size: 13px; opacity: .85; letter-spacing: 2px; }
+  .setback-hero .text { font-size: 26px; font-weight: 800; margin: 12px 0 4px; letter-spacing: 1px; }
+  .setback-hero .tip { font-size: 13px; opacity: .9; }
+
+  .decision-box { background: #fff; border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+  .decision-box h3 { font-size: 16px; margin-bottom: 10px; }
+
+  .pick-box { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pick-item {
+    border: 2px solid #efe0cd; border-radius: 12px; padding: 8px 12px; cursor: pointer;
+    font-size: 14px; display: inline-flex; align-items: center; gap: 6px; background: #fff;
+    transition: all .12s;
+  }
+  .pick-item.picked { border-color: var(--accent); background: #fff3f0; font-weight: 700; }
+  .pick-item:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ---------- 玩家手牌总览 ---------- */
+  .overview { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  .overview h3 { font-size: 15px; margin-bottom: 10px; color: var(--ink2); }
+  .players-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+  .p-col { min-width: 108px; background: #fbf6ee; border-radius: 12px; padding: 10px; }
+  .p-col .pname { font-size: 13px; font-weight: 700; margin-bottom: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .p-col .pname .me { color: var(--accent); }
+  .p-col .hand { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; }
+  .mini-card { width: 26px; height: 34px; border-radius: 6px; background: #fff; border: 1px solid #e6d5c0; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; }
+  .mini-card.kept { border-color: var(--accent); }
+  .mini-card.dropped { opacity: .35; text-decoration: line-through; }
+  .p-col .sb-row { margin-top: 6px; font-size: 10.5px; color: #7d5a8f; text-align: center; line-height: 1.5; }
+  .p-col .sb-row .refused { color: #999; }
+
+  /* ---------- 阶段进度 ---------- */
+  .progress { display: flex; gap: 6px; align-items: center; margin-bottom: 14px; }
+  .step {
+    flex: 1; text-align: center; font-size: 12px; color: var(--ink2); padding: 7px 2px;
+    background: #f4e9da; border-radius: 10px; white-space: nowrap;
+  }
+  .step.on { background: var(--accent); color: #fff; font-weight: 700; }
+  .step.done { background: #d9ecd0; color: #4c7a3d; }
+
+  /* ---------- 结算 ---------- */
+  .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .result-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .result-card .rname { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+  .result-card .section { font-size: 12px; color: var(--ink2); margin: 8px 0 4px; }
+  .result-card .kept-cards { display: flex; flex-wrap: wrap; gap: 5px; }
+  .result-card .mini-card.kept { width: 34px; height: 46px; font-size: 20px; }
+  .sb-kept { display: inline-block; background: #efe4f5; color: #7d5a8f; border-radius: 8px; padding: 4px 8px; font-size: 12px; margin: 2px; }
+  .sb-refused { display: inline-block; background: #f2ede7; color: #9b8b7d; border-radius: 8px; padding: 4px 8px; font-size: 12px; margin: 2px; }
+
+  /* ---------- 消息 / toast ---------- */
+  #toast {
+    position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%) translateY(20px);
+    background: rgba(70,50,35,.92); color: #fff; padding: 12px 22px; border-radius: 999px;
+    font-size: 14px; opacity: 0; transition: all .25s; pointer-events: none; z-index: 99; max-width: 86vw;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .hidden { display: none !important; }
+  .center { text-align: center; }
+  .mt { margin-top: 14px; }
+  .mb { margin-bottom: 14px; }
+  .small-text { font-size: 12.5px; color: var(--ink2); }
+  .link-like { color: var(--accent); cursor: pointer; text-decoration: underline; font-size: 13px; }
+
+  .divider { border: none; border-top: 1px dashed #e6d5c0; margin: 14px 0; }
+  .waiting-tip { background: #fff3e2; border-radius: 12px; padding: 16px; text-align: center; color: var(--ink2); font-size: 14px; }
+  .progress-note { text-align: center; font-size: 13px; color: var(--ink2); margin-bottom: 8px; }
+
+  @media (max-width: 640px) {
+    header.top h1 { font-size: 24px; }
+    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+    .room-code { font-size: 28px; letter-spacing: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="deco" style="top:6%;left:4%;">🌸</div>
+<div class="deco" style="top:22%;right:5%;">🍃</div>
+<div class="deco" style="bottom:12%;left:6%;">🌼</div>
+<div class="deco" style="bottom:4%;right:8%;">🍑</div>
+
+<div id="app" class="wrap"></div>
+<div id="toast"></div>
+
+<script>
+/* ==================================================================== */
+/* 数据                                                                    */
+/* ==================================================================== */
+const PHASES = ['0-10岁', '11-20岁', '21-30岁', '31-40岁', '迟暮之年'];
+
+const BASE_CARDS = [
+  { id: 'b01', name: '亲情',           icon: '👨‍👩‍👧‍👦', desc: '家人的陪伴与支持', color: '#f4a7b9' },
+  { id: 'b02', name: '信心',           icon: '💪',      desc: '相信自己能行',     color: '#7fb069' },
+  { id: 'b03', name: '善良',           icon: '🌷',      desc: '温柔对待世界',     color: '#8fd3a0' },
+  { id: 'b04', name: '才华',           icon: '🎨',      desc: '天赋与创造力',     color: '#6fa8dc' },
+  { id: 'b05', name: '智商',           icon: '🧠',      desc: '聪明与学习力',     color: '#5c8dd6' },
+  { id: 'b06', name: '信任',           icon: '🤝',      desc: '被人信任与托付',   color: '#7ac7c2' },
+  { id: 'b07', name: '坚强',           icon: '🛡️',      desc: '扛住风雨的韧性',   color: '#8d9ec6' },
+  { id: 'b08', name: '颜值',           icon: '✨',      desc: '好看的外表',       color: '#f0a35e' },
+  { id: 'b09', name: '伯乐',           icon: '🧭',      desc: '贵人指路，机遇相助', color: '#e8b64c' },
+  { id: 'b10', name: '情商',           icon: '😌',      desc: '懂人心，会相处',   color: '#e08bb0' },
+  { id: 'b11', name: '健康',           icon: '🍀',      desc: '无病无痛的好身体', color: '#6cc98a' },
+  { id: 'b12', name: '爱宠',           icon: '🐱',      desc: '毛孩子的陪伴',     color: '#e89a6c' },
+  { id: 'b13', name: '知心挚友',       icon: '🍻',      desc: '无话不谈的朋友',   color: '#f2b45c' },
+  { id: 'b14', name: '相濡以沫的恋人', icon: '💑',      desc: '一生相守的爱情',   color: '#ef7f9e' },
+  { id: 'b15', name: '原谅的勇气',     icon: '🕊️',      desc: '放下伤害，重头来过', color: '#a5cfe8' },
+  { id: 'b16', name: '养家的能力',     icon: '💰',      desc: '撑起一个家的担当', color: '#9b8bd6' },
+  { id: 'b17', name: '爱人的能力',     icon: '❤️',      desc: '真诚去爱与被爱',   color: '#e8697f' },
+  { id: 'b18', name: '正义感',         icon: '⚖️',      desc: '是非分明，挺身而出', color: '#74a6c9' },
+];
+
+const SETBACKS = [
+  { id: 's01', phase: 0, text: '家庭经济破产',     conflicts: ['b16', 'b02', 'b11'] },
+  { id: 's02', phase: 0, text: '父母日常吵架',     conflicts: ['b01', 'b06'] },
+  { id: 's03', phase: 0, text: '成绩永远倒数第一', conflicts: ['b05', 'b04', 'b02'] },
+  { id: 's04', phase: 0, text: '经常被父母贬低',   conflicts: ['b02', 'b01'] },
+  { id: 's05', phase: 0, text: '自己养的宠物离世', conflicts: ['b12'] },
+  { id: 's06', phase: 0, text: '被同学欺负',       conflicts: ['b02', 'b07'] },
+  { id: 's07', phase: 0, text: '身体先天缺陷',     conflicts: ['b11', 'b08'] },
+  { id: 's08', phase: 0, text: '被拐卖',           conflicts: ['b01', 'b06'] },
+  { id: 's09', phase: 1, text: '被孤立',           conflicts: ['b13', 'b10', 'b06'] },
+  { id: 's10', phase: 1, text: '考不上大学',       conflicts: ['b05', 'b04', 'b02'] },
+  { id: 's11', phase: 1, text: '家人病重',         conflicts: ['b01', 'b11', 'b16'] },
+  { id: 's12', phase: 1, text: '作弊被抓',         conflicts: ['b06', 'b02'] },
+  { id: 's13', phase: 1, text: '犯罪坐牢',         conflicts: ['b03', 'b18', 'b06'] },
+  { id: 's14', phase: 1, text: '至亲离世',         conflicts: ['b01'] },
+  { id: 's15', phase: 1, text: '在校时被造谣',     conflicts: ['b06', 'b13', 'b02'] },
+  { id: 's16', phase: 1, text: '被校园霸凌',       conflicts: ['b02', 'b07', 'b03'] },
+  { id: 's17', phase: 2, text: '恋人背叛',         conflicts: ['b14', 'b06', 'b17'] },
+  { id: 's18', phase: 2, text: '长得丑',           conflicts: ['b08'] },
+  { id: 's19', phase: 2, text: '十年无工作',       conflicts: ['b16', 'b04', 'b02'] },
+  { id: 's20', phase: 2, text: '母胎solo',         conflicts: ['b17', 'b14', 'b10'] },
+  { id: 's21', phase: 2, text: '遭遇车祸',         conflicts: ['b11', 'b07'] },
+  { id: 's22', phase: 2, text: '连住五年地下室',   conflicts: ['b02', 'b16'] },
+  { id: 's23', phase: 2, text: '挣不到钱',         conflicts: ['b16', 'b04'] },
+  { id: 's24', phase: 2, text: '嫁妈宝男',         conflicts: ['b17', 'b14', 'b10'] },
+  { id: 's25', phase: 3, text: '被网络暴力',       conflicts: ['b02', 'b06', 'b08'] },
+  { id: 's26', phase: 3, text: '无家可归',         conflicts: ['b01', 'b16', 'b11'] },
+  { id: 's27', phase: 3, text: '疾病缠身',         conflicts: ['b11'] },
+  { id: 's28', phase: 3, text: '身无分文',         conflicts: ['b16', 'b02'] },
+  { id: 's29', phase: 3, text: '被裁员',           conflicts: ['b16', 'b04', 'b02'] },
+  { id: 's30', phase: 3, text: '妻离子散',         conflicts: ['b14', 'b01', 'b17'] },
+  { id: 's31', phase: 3, text: '家产被骗',         conflicts: ['b16', 'b06', 'b05'] },
+  { id: 's32', phase: 3, text: '职场霸凌',         conflicts: ['b02', 'b07', 'b04'] },
+  { id: 's33', phase: 3, text: '自杀未遂',         conflicts: ['b07', 'b02', 'b11'] },
+  { id: 's34', phase: 3, text: '遭遇家暴',         conflicts: ['b11', 'b02', 'b07'] },
+  { id: 's35', phase: 4, text: '患阿兹海默',       conflicts: ['b05', 'b04', 'b13'] },
+  { id: 's36', phase: 4, text: '子女啃老',         conflicts: ['b16', 'b01'] },
+  { id: 's37', phase: 4, text: '孤身一人',         conflicts: ['b14', 'b13', 'b01'] },
+  { id: 's38', phase: 4, text: '变植物人',         conflicts: ['b11', 'b05', 'b04'] },
+  { id: 's39', phase: 4, text: '医院常驻',         conflicts: ['b11', 'b07'] },
+  { id: 's40', phase: 4, text: '子女不管',         conflicts: ['b01', 'b16'] },
+  { id: 's41', phase: 4, text: '白发人送黑发人',   conflicts: ['b01', 'b11'] },
+  { id: 's42', phase: 4, text: '晚年拾荒养活自己', conflicts: ['b16', 'b11', 'b02'] },
+];
+
+const CARDS_BY_ID = Object.fromEntries(BASE_CARDS.map(c => [c.id, c]));
+const SB_BY_ID = Object.fromEntries(SETBACKS.map(s => [s.id, s]));
+const PHASE_EMOJI = ['👶', '🎒', '💼', '🧗', '🍂'];
+
+/* ==================================================================== */
+/* 工具                                                                    */
+/* ==================================================================== */
+const $ = sel => document.querySelector(sel);
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+let toastTimer = null;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function shuffled(arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function samePlayer(a, b) { return a.id === b.id; }
+
+/* ==================================================================== */
+/* 应用状态                                                                */
+/* ==================================================================== */
+const App = {
+  mode: null,          // 'local' | 'online'
+  ws: null,
+  myId: null,
+  isHost: false,
+  roomCode: null,
+  state: null,
+  localGame: null,
+  currentOperatorId: null,   // 本地模式：当前操作玩家
+  picked: [],                 // 选牌阶段的临时选择
+  pendingDiscards: [],        // 拒绝挫折时选择放弃的2张
+  acceptMode: null,           // null | 'accept' | 'refuse'（当前决策面板模式）
+  acceptDiscard: null,        // 接受挫折时选中的放弃牌
+  myName: '',
+  serverUrl: '',
+};
+
+/* ==================================================================== */
+/* 本地同屏模式状态机（与服务器逻辑一致）                                 */
+/* ==================================================================== */
+function createLocalGame(hostName) {
+  let seq = 1;
+  const players = [];
+  const host = {
+    id: 'p' + seq++, name: hostName || '房主', online: true, isHost: true,
+    status: 'lobby', hand: [], chosen: [], discarded: [], setbacks: [],
+    currentSetback: null, conflictOptions: [],
+  };
+  players.push(host);
+  let stage = 'lobby';
+  let currentPhase = -1;
+  let decks = [], deckPos = [0, 0, 0, 0, 0];
+
+  function pub(p) {
+    return {
+      id: p.id, name: p.name, isHost: p.isHost, online: p.online,
+      status: p.status, hand: p.hand, chosen: p.chosen, discarded: p.discarded,
+      setbacks: p.setbacks, currentSetback: p.currentSetback, conflictOptions: p.conflictOptions,
+    };
+  }
+  function getState() {
+    return { type: 'state', mode: 'local', roomCode: '—', stage, currentPhase, players: players.map(pub) };
+  }
+  function notify() { if (localGame.onState) localGame.onState(getState()); }
+
+  function reset() {
+    stage = 'choosing'; currentPhase = -1;
+    decks = PHASES.map((_, p) => shuffled(SETBACKS.filter(s => s.phase === p).map(s => s.id)));
+    deckPos = [0, 0, 0, 0, 0];
+    players.forEach(p => {
+      p.status = 'choosing'; p.hand = []; p.chosen = []; p.discarded = []; p.setbacks = [];
+      p.currentSetback = null; p.conflictOptions = [];
+    });
+  }
+  function draw(phase) {
+    let pos = deckPos[phase];
+    if (pos >= decks[phase].length) { decks[phase] = shuffled(SETBACKS.filter(s => s.phase === phase).map(s => s.id)); pos = 0; }
+    const id = decks[phase][pos]; deckPos[phase] = pos + 1; return id;
+  }
+  function dealPhase() {
+    players.forEach(p => {
+      p.currentSetback = draw(currentPhase);
+      const sb = SB_BY_ID[p.currentSetback];
+      p.conflictOptions = (sb ? sb.conflicts : []).filter(id => p.hand.includes(id));
+      p.status = 'deciding';
+    });
+  }
+  function afterChoice() {
+    if (stage !== 'choosing') return;
+    if (players.every(p => p.status !== 'choosing')) {
+      stage = 'setback'; currentPhase = 0; dealPhase();
+    }
+  }
+  function afterSetback() {
+    if (stage !== 'setback') return;
+    if (players.every(p => p.status === 'decided' || p.status === 'done')) {
+      if (currentPhase >= 4) { stage = 'finished'; players.forEach(p => p.status = 'done'); }
+      else { currentPhase += 1; dealPhase(); }
+    }
+  }
+
+  const localGame = {
+    getState, players,
+    addPlayer(name) {
+      if (players.length >= 12) { toast('最多12人'); return false; }
+      const p = { id: 'p' + seq++, name: String(name).slice(0, 12), online: true, isHost: false,
+        status: 'lobby', hand: [], chosen: [], discarded: [], setbacks: [], currentSetback: null, conflictOptions: [] };
+      players.push(p); notify(); return true;
+    },
+    removePlayer(id) {
+      if (players.length <= 1) { toast('至少要保留1名玩家'); return; }
+      const idx = players.findIndex(p => p.id === id);
+      if (idx < 0) return;
+      players.splice(idx, 1);
+      if (!players.some(p => p.isHost)) players[0].isHost = true;
+      notify();
+    },
+    start() {
+      if (players.length < 2) { toast('至少需要2名玩家'); return; }
+      reset(); notify();
+    },
+    choose(id, cardIds) {
+      const p = players.find(x => x.id === id);
+      if (!p || stage !== 'choosing' || p.status !== 'choosing') return;
+      p.chosen = cardIds.slice(); p.hand = cardIds.slice(); p.status = 'waiting';
+      afterChoice(); notify();
+    },
+    accept(id, discardId) {
+      const p = players.find(x => x.id === id);
+      if (!p || stage !== 'setback' || p.status !== 'deciding') return;
+      if (!p.hand.includes(discardId)) return;
+      if (p.conflictOptions.length && !p.conflictOptions.includes(discardId)) return;
+      p.hand = p.hand.filter(x => x !== discardId);
+      p.discarded.push(discardId);
+      p.setbacks.push({ phase: currentPhase, setbackId: p.currentSetback, choice: 'accept' });
+      p.currentSetback = null; p.conflictOptions = [];
+      p.status = 'decided';
+      afterSetback(); notify();
+    },
+    refuse(id, discardIds) {
+      const p = players.find(x => x.id === id);
+      if (!p || stage !== 'setback' || p.status !== 'deciding') return;
+      if (discardIds.length !== 2 || new Set(discardIds).size !== 2 || !discardIds.every(x => p.hand.includes(x))) return;
+      p.setbacks.push({ phase: currentPhase, setbackId: p.currentSetback, choice: 'refuse' });
+      p.hand = p.hand.filter(x => !discardIds.includes(x));
+      p.discarded.push(...discardIds);
+      p.currentSetback = null; p.conflictOptions = [];
+      p.status = 'decided';
+      afterSetback(); notify();
+    },
+    restart() { reset(); notify(); },
+  };
+  return localGame;
+}
+
+/* ==================================================================== */
+/* 联机模式                                                                */
+/* ==================================================================== */
+function connectOnline(url) {
+  try {
+    const ws = new WebSocket(url);
+    App.ws = ws;
+    ws.onopen = () => { toast('已连接服务器，输入昵称后可创建或加入房间'); App.onlineConnected = true; renderAll(); };
+    ws.onmessage = e => {
+      let msg; try { msg = JSON.parse(e.data); } catch (err) { return; }
+      if (msg.type === 'created' || msg.type === 'joined') {
+        App.myId = msg.playerId; App.isHost = msg.isHost; App.roomCode = msg.roomCode;
+        toast(msg.type === 'created' ? '房间已创建' : '已加入房间');
+      } else if (msg.type === 'state') {
+        App.state = msg; renderAll();
+      } else if (msg.type === 'error') {
+        toast(msg.message || '操作失败');
+      }
+    };
+    ws.onclose = () => {
+      App.onlineConnected = false;
+      if (App.mode === 'online') { toast('与服务器断开连接'); renderAll(); }
+    };
+    ws.onerror = () => { toast('无法连接服务器，请检查地址'); };
+  } catch (e) {
+    toast('连接失败：' + e.message);
+  }
+}
+
+function sendOnline(obj) {
+  if (App.ws && App.ws.readyState === 1) App.ws.send(JSON.stringify(obj));
+  else toast('未连接到服务器');
+}
+
+/* ==================================================================== */
+/* 渲染：主入口                                                            */
+/* ==================================================================== */
+function renderAll() {
+  const app = $('#app');
+  if (!App.mode) { app.innerHTML = viewStart(); bindStart(); return; }
+  if (App.mode === 'online' && !App.onlineConnected) { app.innerHTML = viewOnlineConnect(); bindOnlineConnect(); return; }
+  if (!App.state) { app.innerHTML = viewOnlineHome(); bindOnlineHome(); return; }
+
+  const st = App.state;
+  if (st.stage === 'lobby') { app.innerHTML = viewLobby(st); bindLobby(st); return; }
+  if (st.stage === 'finished') { app.innerHTML = viewResult(st); bindResult(st); return; }
+  app.innerHTML = viewGame(st); bindGame(st);
+}
+
+function topHeader(st) {
+  const modeTag = App.mode === 'local'
+    ? '<span class="badge">🏠 本地同屏模式</span>'
+    : `<span class="badge">🌐 联机 · 房间号 <b style="color:var(--accent);letter-spacing:2px">${esc(st ? st.roomCode : '')}</b></span>`;
+  return `<header class="top"><h1>人生卡牌<small class="sub">桃花坞同款 · 从18张底牌里，选你的人生</small></h1>${modeTag}</header>`;
+}
+
+/* ---------- 启动页 ---------- */
+function viewStart() {
+  return `
+  ${topHeader(null)}
+  <div class="card start-hero">
+    <div class="big-icon">🎴</div>
+    <p>从 <b>18 张人生底牌</b> 中选出 <b>10 张</b>，走完 <b>5 个人生阶段</b>。<br>
+    每个阶段随机抽到一张 <b>挫折牌</b>：<b>接受</b>，就放弃一张与它冲突的底牌；<b>拒绝</b>，就放弃两张底牌。<br>
+    最后留下的，就是你看重的人生。房间里的每个人都能看到彼此的牌。</p>
+  </div>
+  <div class="card">
+    <h2>👤 你的昵称</h2>
+    <div class="row">
+      <input type="text" id="nick-input" maxlength="12" placeholder="输入昵称（2-12人一起玩）" value="${esc(App.myName)}">
+    </div>
+  </div>
+  <div class="mode-grid">
+    <div class="mode-card" onclick="App.pickMode('local')">
+      <h3><span class="emoji">🏠</span>本地同屏</h3>
+      <p>一台电脑/手机 + 投屏，由主持人轮流为每位玩家操作。无需服务器，打开即玩，适合线下聚会。</p>
+    </div>
+    <div class="mode-card" onclick="App.pickMode('online')">
+      <h3><span class="emoji">🌐</span>联机游戏</h3>
+      <p>每位玩家用自己的手机/电脑加入房间，各自操作、实时同步，互相看到彼此的牌。需要运行服务器。</p>
+    </div>
+  </div>
+  <div class="card">
+    <h2>📜 游戏规则</h2>
+    <div class="rules">
+      <ul>
+        <li><b>选底牌</b>：每人从 18 张人生底牌中选 10 张，作为人生最珍视的东西。</li>
+        <li><b>走人生</b>：依次经历 <b>${PHASES.join(' → ')}</b> 5 个阶段，每个阶段随机抽取 1 张挫折牌。</li>
+        <li><b>面对挫折</b>：<b>接受</b> → 挫折收入手牌，但必须放弃 1 张与它冲突的底牌；<b>拒绝</b> → 放弃 2 张底牌。</li>
+        <li><b>结局</b>：5 个阶段走完，剩下几张底牌、接受了哪些挫折，就是你的“人生答卷”。</li>
+      </ul>
+    </div>
+  </div>`;
+}
+function bindStart() {
+  const input = $('#nick-input');
+  input.addEventListener('input', () => App.myName = input.value);
+  App.myName = input.value;
+}
+
+/* ---------- 联机连接页 ---------- */
+function viewOnlineConnect() {
+  const defaultUrl = (location.protocol === 'http:' || location.protocol === 'https:')
+    ? `${location.protocol === 'https:' ? 'wss://' : 'ws://'}${location.host}`
+    : 'ws://192.168.1.100:8787';
+  return `
+  ${topHeader(null)}
+  <div class="card">
+    <h2>🌐 连接联机服务器</h2>
+    <div class="col">
+      <input type="text" id="server-url" placeholder="服务器地址，如 ws://192.168.1.100:8787" value="${esc(App.serverUrl || defaultUrl)}">
+      <button class="btn blue" onclick="App.connectServer()">连接服务器</button>
+      <div class="small-text">服务器由运行 <b>server.js</b> 的那台电脑提供。若你正在通过服务器打开的页面，地址会自动填好。</div>
+    </div>
+  </div>
+  <div class="card center">
+    <div class="muted">想回到本地同屏模式？</div>
+    <div class="mt"><button class="btn ghost" onclick="App.backStart()">← 返回选择模式</button></div>
+  </div>`;
+}
+function bindOnlineConnect() {
+  const input = $('#server-url');
+  input.addEventListener('input', () => App.serverUrl = input.value);
+  App.serverUrl = input.value;
+}
+
+/* ---------- 联机主页（已连接，创建/加入房间） ---------- */
+function viewOnlineHome() {
+  return `
+  ${topHeader(null)}
+  <div class="card">
+    <h2>👋 ${esc(App.myName || '玩家')}</h2>
+    <div class="muted">已连接到服务器，请创建新房间或加入朋友的房间。</div>
+    <div class="mt row">
+      <button class="btn" onclick="App.createRoom()">＋ 创建房间</button>
+    </div>
+    <hr class="divider">
+    <div class="muted">或输入房间号加入：</div>
+    <div class="mt row">
+      <input type="text" id="join-room-input" maxlength="4" placeholder="4位房间号">
+      <button class="btn ghost" onclick="App.joinRoom()">加入房间</button>
+    </div>
+  </div>
+  <div class="card center">
+    <button class="btn ghost" onclick="App.backStart()">← 返回选择模式</button>
+  </div>`;
+}
+function bindOnlineHome() {
+  const input = $('#join-room-input');
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') App.joinRoom(); });
+}
+
+/* ---------- 房间大厅 ---------- */
+function viewLobby(st) {
+  const isHost = App.mode === 'local' || App.isHost;
+  let playerHtml = st.players.map(p => {
+    const cls = ['player-chip', p.isHost ? 'host' : '', p.online ? '' : 'offline'].join(' ');
+    const crown = p.isHost ? ' <span class="crown">👑</span>' : '';
+    const del = (App.mode === 'local' && !p.isHost) ? ` <button onclick="event.stopPropagation();App.removeLocalPlayer('${p.id}')" title="移除">✕</button>` : '';
+    return `<span class="${cls}"><span class="dot" style="background:${avatarColor(p.id)}">${esc(p.name.slice(0,1))}</span>${esc(p.name)}${crown}${del}</span>`;
+  }).join('');
+  if (App.mode === 'local' && st.players.length < 12) {
+    playerHtml += `<span class="player-chip" style="border-style:dashed;color:var(--ink2);cursor:pointer" onclick="App.focusAddPlayer()">＋ 添加玩家</span>`;
+  }
+
+  let addBox = '';
+  if (App.mode === 'local') {
+    addBox = `<div class="row mt" id="local-add-box">
+      <input type="text" id="local-add-name" maxlength="12" placeholder="输入玩家昵称，回车添加">
+      <button class="btn green small" onclick="App.addLocalPlayer()">添加</button>
+    </div>`;
+  }
+
+  const startBtn = isHost
+    ? `<button class="btn big" onclick="App.startGame()">🎮 开始游戏</button>`
+    : `<div class="waiting-tip">⏳ 等待房主开始游戏…</div>`;
+
+  const roomTag = App.mode === 'online'
+    ? `<div class="center"><div class="room-code">${esc(st.roomCode)}</div><div class="muted">把房间号告诉朋友，让他们在「联机游戏」中输入加入</div></div>`
+    : `<div class="center"><div class="muted">🏠 本地同屏模式：添加 ${st.players.length}/12 位玩家后开始</div></div>`;
+
+  return `
+  ${topHeader(st)}
+  ${roomTag}
+  <div class="card">
+    <h2>👥 玩家列表（${st.players.length}/12）</h2>
+    <div class="player-list">${playerHtml}</div>
+    ${addBox}
+  </div>
+  <div class="card center">${startBtn}</div>
+  <div class="card">
+    <h2>📜 游戏规则</h2>
+    <div class="rules">
+      <ul>
+        <li>每人从 18 张底牌中选 <b>10 张</b>。</li>
+        <li>5 个阶段（${PHASES.join(' / ')}），每阶段随机抽 1 张挫折牌。</li>
+        <li><b>接受</b>：挫折留下，放弃 1 张与它冲突的底牌；<b>拒绝</b>：放弃 2 张底牌。</li>
+        <li>所有人的底牌全程互相可见。</li>
+      </ul>
+    </div>
+  </div>`;
+}
+function bindLobby(st) {
+  if (App.mode === 'local') {
+    const addName = $('#local-add-name');
+    if (addName) {
+      addName.addEventListener('keydown', e => { if (e.key === 'Enter') App.addLocalPlayer(); });
+      addName.focus();
+    }
+  }
+}
+
+/* ---------- 游戏主界面 ---------- */
+function viewGame(st) {
+  const isLocal = App.mode === 'local';
+  const me = isLocal ? st.players.find(p => p.id === App.currentOperatorId) || st.players[0]
+                     : st.players.find(p => p.id === App.myId);
+
+  const progress = progressHtml(st);
+
+  // 所有玩家的手牌总览（互相可见）
+  const overview = st.stage === 'choosing' || st.stage === 'setback'
+    ? `<div class="overview"><h3>👀 所有玩家的牌（互相可见）</h3><div class="players-row">${st.players.map(p => playerColHtml(p)).join('')}</div></div>`
+    : '';
+
+  let actionHtml = '';
+  if (st.stage === 'choosing') {
+    actionHtml = choosingHtml(st, me);
+  } else if (st.stage === 'setback') {
+    actionHtml = setbackHtml(st, me);
+  }
+
+  const operatorNote = isLocal
+    ? `<div class="progress-note">🎛️ 主持人模式：正在为 <b>${esc(me ? me.name : '')}</b> 操作，点击下方玩家头像可切换</div>`
+    : '';
+
+  return `
+  ${topHeader(st)}
+  ${progress}
+  ${operatorNote}
+  ${overview}
+  ${actionHtml}
+  <div class="card">
+    <h2>👥 玩家</h2>
+    <div class="player-list">${st.players.map(p => playerSwitchHtml(st, p, isLocal)).join('')}</div>
+  </div>`;
+}
+
+function progressHtml(st) {
+  let steps = `<div class="step ${st.stage === 'choosing' ? 'on' : 'done'}">🎴 选底牌</div>`;
+  for (let i = 0; i < 5; i++) {
+    const on = st.stage === 'setback' && st.currentPhase === i;
+    const done = st.stage === 'finished' || (st.stage === 'setback' && st.currentPhase > i);
+    steps += `<div class="step ${on ? 'on' : done ? 'done' : ''}">${PHASE_EMOJI[i]} ${i+1}/5 ${PHASES[i]}</div>`;
+  }
+  return `<div class="progress">${steps}</div>`;
+}
+
+function avatarColor(id) {
+  const colors = ['#e8807f', '#7fb069', '#6fa8dc', '#9b8bd6', '#f0a35e', '#e08bb0', '#7ac7c2', '#e8b64c', '#74a6c9', '#ef7f9e', '#8d9ec6', '#e89a6c'];
+  let h = 0; for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return colors[h % colors.length];
+}
+
+function playerSwitchHtml(st, p, isLocal) {
+  const active = App.mode === 'local' && p.id === App.currentOperatorId;
+  const cls = ['player-chip', p.isHost ? 'host' : '', p.online ? '' : 'offline', active ? '' : ''].join(' ');
+  const statusTag = {
+    choosing: ' 🎴选牌中', waiting: ' ✅已选', deciding: ' ⚡面对挫折中', decided: ' ⭕已决定', done: ' 🏁已完成', lobby: '',
+  }[p.status] || '';
+  if (isLocal) {
+    return `<span class="${cls}" style="${active ? 'border-color:var(--accent);background:#fff3f0' : ''};cursor:pointer" onclick="App.switchOperator('${p.id}')"><span class="dot" style="background:${avatarColor(p.id)}">${esc(p.name.slice(0,1))}</span>${esc(p.name)}${p.isHost ? ' <span class="crown">👑</span>' : ''}<span class="small-text">${statusTag}</span></span>`;
+  }
+  const me = p.id === App.myId;
+  return `<span class="${cls}"><span class="dot" style="background:${avatarColor(p.id)}">${esc(p.name.slice(0,1))}</span>${esc(p.name)}${me ? ' <b class="me">(我)</b>' : ''}${p.isHost ? ' <span class="crown">👑</span>' : ''}<span class="small-text">${statusTag}</span></span>`;
+}
+
+function playerColHtml(p) {
+  const kept = (p.hand || []).map(id => `<span class="mini-card kept" title="${esc((CARDS_BY_ID[id] || {}).name || id)}">${esc((CARDS_BY_ID[id] || {}).icon || '?')}</span>`).join('');
+  const dropped = (p.discarded || []).map(id => `<span class="mini-card dropped" title="已放弃：${esc((CARDS_BY_ID[id] || {}).name || id)}">${esc((CARDS_BY_ID[id] || {}).icon || '?')}</span>`).join('');
+  let sbRows = (p.setbacks || []).map(s => {
+    const sb = SB_BY_ID[s.setbackId];
+    return s.choice === 'accept'
+      ? `<div class="sb-row">✔ 接受：${esc(sb ? sb.text : '?')}</div>`
+      : `<div class="sb-row refused">✘ 拒绝：${esc(sb ? sb.text : '?')}</div>`;
+  }).join('');
+  if (p.status === 'deciding' && p.currentSetback) {
+    sbRows += `<div class="sb-row" style="color:#a2648f;font-weight:700">⚡ 正面对：${esc((SB_BY_ID[p.currentSetback] || {}).text || '?')}</div>`;
+  }
+  const me = App.mode === 'online' && p.id === App.myId ? ' <span class="me">(我)</span>' : '';
+  return `<div class="p-col"><div class="pname">${esc(p.name)}${me}</div><div class="hand">${kept || '<span class="small-text">未选</span>'}</div>${dropped ? `<div class="sb-row refused">弃：${dropped}</div>` : ''}${sbRows}</div>`;
+}
+
+/* ---------- 选牌 ---------- */
+function choosingHtml(st, me) {
+  const isMyTurn = me && me.status === 'choosing';
+  const picked = App.picked;
+  if (!isMyTurn) {
+    return `<div class="waiting-tip">⏳ 等待「${esc(me ? me.name : '')}」选完 10 张底牌…</div>`;
+  }
+  const grid = BASE_CARDS.map(c => {
+    const sel = picked.includes(c.id);
+    return `<div class="life-card ${sel ? 'selected' : ''}" onclick="App.togglePick('${c.id}')">
+      <span class="colorbar" style="background:${c.color}"></span>
+      <span class="ic">${c.icon}</span>
+      <span class="nm">${esc(c.name)}</span>
+      <span class="ds">${esc(c.desc)}</span>
+    </div>`;
+  }).join('');
+  return `
+  <div class="card">
+    <h2>🎴 为「${esc(me.name)}」选底牌 <span class="muted">（已选 ${picked.length}/10）</span></h2>
+    <div class="cards-grid">${grid}</div>
+    <div class="mt center">
+      <button class="btn big" ${picked.length === 10 ? '' : 'disabled'} onclick="App.confirmPick()">确认这 10 张人生底牌</button>
+    </div>
+    <div class="mt small-text center">点击卡牌选中/取消，选满 10 张后确认。</div>
+  </div>`;
+}
+
+/* ---------- 挫折 ---------- */
+function setbackHtml(st, me) {
+  const isMyTurn = me && me.status === 'deciding';
+  if (!isMyTurn) {
+    return `<div class="waiting-tip">⏳ ${App.mode === 'online' ? '你已完成本阶段，等待其他玩家决定…' : '等待「' + esc(me ? me.name : '') + '」面对人生挫折…'}</div>`;
+  }
+  const sb = SB_BY_ID[me.currentSetback];
+  if (!sb) return '';
+  const phase = PHASES[st.currentPhase];
+  const phaseEmoji = PHASE_EMOJI[st.currentPhase];
+
+  // 冲突牌（在手牌中）
+  const conflicts = me.conflictOptions || [];
+
+  // 决策面板：未选择接受/拒绝时
+  let decisionPanel = '';
+  if (!App.acceptMode) {
+    decisionPanel = `
+    <div class="row mt center" style="justify-content:center">
+      <button class="btn big green" onclick="App.openAccept()">✅ 接受它（放弃 1 张冲突底牌）</button>
+      <button class="btn big" onclick="App.openRefuse()">❌ 拒绝它（放弃 2 张底牌）</button>
+    </div>`;
+  } else if (App.acceptMode === 'accept') {
+    // 选择1张放弃
+    const options = conflicts.length ? conflicts : me.hand;
+    const tip = conflicts.length
+      ? `这张挫折与你的「${conflicts.map(id => esc((CARDS_BY_ID[id] || {}).name)).join('、')}」相冲突，请选择放弃 1 张：`
+      : '这张挫折没有与你手中底牌直接冲突的项，你可以放弃任意 1 张底牌来接受它：';
+    const chips = options.map(id => {
+      const c = CARDS_BY_ID[id];
+      return `<span class="pick-item ${App.acceptDiscard === id ? 'picked' : ''}" onclick="App.toggleAcceptDiscard('${id}')">${c.icon} ${esc(c.name)}</span>`;
+    }).join('');
+    decisionPanel = `
+    <div class="mt">${tip}</div>
+    <div class="pick-box">${chips}</div>
+    <div class="mt center"><button class="btn big green" ${App.acceptDiscard ? '' : 'disabled'} onclick="App.sendAccept()">确定接受</button>
+    <button class="btn ghost" onclick="App.cancelDecision()">返回</button></div>`;
+  } else {
+    const chips = me.hand.map(id => {
+      const c = CARDS_BY_ID[id];
+      const picked = App.pendingDiscards.includes(id);
+      return `<span class="pick-item ${picked ? 'picked' : ''}" onclick="App.toggleRefuseDiscard('${id}')">${c.icon} ${esc(c.name)}</span>`;
+    }).join('');
+    decisionPanel = `
+    <div class="mt">拒绝挫折需要放弃 <b>2 张</b>底牌，请选择（已选 ${App.pendingDiscards.length}/2）：</div>
+    <div class="pick-box">${chips}</div>
+    <div class="mt center"><button class="btn big" ${App.pendingDiscards.length === 2 ? '' : 'disabled'} onclick="App.sendRefuse()">确定拒绝</button>
+    <button class="btn ghost" onclick="App.cancelDecision()">返回</button></div>`;
+  }
+
+  return `
+  <div class="setback-hero">
+    <div class="phase-tag">${phaseEmoji} 人生阶段 ${st.currentPhase + 1}/5 · ${phase}</div>
+    <div class="text">「${esc(sb.text)}」</div>
+    <div class="tip">这是抽到的人生挫折</div>
+  </div>
+  <div class="decision-box">
+    <h3>💭 面对挫折，${esc(me.name)} 的选择？</h3>
+    <div class="small-text">接受 = 挫折留在你的人生里，但代价是放弃 1 张与它冲突的底牌；<br>拒绝 = 它不会发生，但你的人生要放弃 2 张底牌来交换。</div>
+    ${decisionPanel}
+  </div>`;
+}
+
+/* ---------- 结算 ---------- */
+function viewResult(st) {
+  const isHost = App.mode === 'local' || App.isHost;
+  const cards = st.players.map(p => {
+    const kept = p.hand.map(id => `<span class="mini-card kept" title="${esc((CARDS_BY_ID[id] || {}).name)}">${esc((CARDS_BY_ID[id] || {}).icon)}</span>`).join('') || '<span class="small-text">一张不剩</span>';
+    const sbAcc = (p.setbacks || []).filter(s => s.choice === 'accept').map(s => `<span class="sb-kept">✔ ${esc((SB_BY_ID[s.setbackId] || {}).text)}</span>`).join('');
+    const sbRef = (p.setbacks || []).filter(s => s.choice === 'refuse').map(s => `<span class="sb-refused">✘ ${esc((SB_BY_ID[s.setbackId] || {}).text)}</span>`).join('');
+    const dropped = p.discarded.map(id => `<span class="mini-card dropped" title="已放弃：${esc((CARDS_BY_ID[id] || {}).name)}">${esc((CARDS_BY_ID[id] || {}).icon)}</span>`).join('');
+    return `<div class="result-card">
+      <div class="rname">${esc(p.name)}</div>
+      <div class="section">最终留下（${p.hand.length} 张）</div>
+      <div class="kept-cards">${kept}</div>
+      ${sbAcc ? `<div class="section">接受的挫折</div>${sbAcc}` : ''}
+      ${sbRef ? `<div class="section">拒绝过的挫折</div>${sbRef}` : ''}
+      ${dropped ? `<div class="section">曾放弃的牌</div><div class="kept-cards">${dropped}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const restartBtn = isHost
+    ? `<button class="btn big" onclick="App.restartGame()">🔄 再来一局</button>`
+    : `<div class="waiting-tip">等待房主开启下一局…</div>`;
+
+  return `
+  ${topHeader(st)}
+  ${progressHtml(st)}
+  <div class="card">
+    <h2>🏁 你的人生答卷</h2>
+    <div class="muted mb">走完 5 个人生阶段，最终留下的就是内心最珍视的东西。</div>
+    <div class="result-grid">${cards}</div>
+    <div class="mt center">${restartBtn}</div>
+  </div>`;
+}
+function bindResult() { /* 无额外绑定 */ }
+
+/* ---------- 游戏视图事件绑定 ---------- */
+function bindGame(st) { /* 主要事件已在 onclick 中处理 */ }
+
+/* ==================================================================== */
+/* 全局操作函数（挂到 window.App）                                       */
+/* ==================================================================== */
+App.pickMode = function (mode) {
+  const name = App.myName.trim();
+  if (!name) { toast('请先输入昵称'); return; }
+  App.mode = mode;
+  if (mode === 'local') {
+    App.localGame = createLocalGame(name);
+    App.currentOperatorId = App.localGame.players[0].id;
+    App.localGame.onState = st => { App.state = st; renderAll(); };
+    App.state = App.localGame.getState();
+    App.isHost = true;
+    renderAll();
+  } else {
+    renderAll(); // 进入连接页
+  }
+};
+
+App.backStart = function () {
+  if (App.ws) { try { App.ws.close(); } catch (e) {} App.ws = null; }
+  App.mode = null; App.state = null; App.onlineConnected = false;
+  App.myId = null; App.isHost = false; App.roomCode = null;
+  App.localGame = null;
+  renderAll();
+};
+
+App.connectServer = function () {
+  const url = (App.serverUrl || $('#server-url').value || '').trim();
+  if (!url) { toast('请输入服务器地址'); return; }
+  if (!/^wss?:\/\//.test(url)) { toast('地址需要以 ws:// 或 wss:// 开头'); return; }
+  App.serverUrl = url;
+  connectOnline(url);
+};
+
+App.createRoom = function () {
+  sendOnline({ type: 'create', name: App.myName });
+};
+App.joinRoom = function () {
+  const input = $('#join-room-input');
+  const code = (input ? input.value : '').trim();
+  if (!code) { toast('请输入房间号'); return; }
+  sendOnline({ type: 'join', room: code, name: App.myName });
+};
+
+App.focusAddPlayer = function () {
+  const el = $('#local-add-name');
+  if (el) el.focus();
+};
+App.addLocalPlayer = function () {
+  const input = $('#local-add-name');
+  const name = (input ? input.value : '').trim();
+  if (!name) { toast('请输入昵称'); return; }
+  if (App.localGame.addPlayer(name)) { if (input) input.value = ''; }
+};
+App.removeLocalPlayer = function (id) {
+  if (App.localGame) App.localGame.removePlayer(id);
+  if (App.currentOperatorId === id) App.currentOperatorId = App.localGame.players[0].id;
+};
+
+App.startGame = function () {
+  if (App.mode === 'local') {
+    App.picked = [];
+    App.localGame.start();
+    const first = App.localGame.players[0];
+    App.currentOperatorId = first.id;
+    // 本地模式：主持人直接开始选第一个玩家的牌
+    App.picked = [];
+    renderAll();
+  } else {
+    sendOnline({ type: 'start' });
+  }
+};
+
+App.switchOperator = function (id) {
+  if (App.mode !== 'local') return;
+  App.currentOperatorId = id;
+  App.picked = [];
+  App.acceptMode = null; App.acceptDiscard = null; App.pendingDiscards = [];
+  renderAll();
+};
+
+/* ---------- 选牌 ---------- */
+App.togglePick = function (id) {
+  const idx = App.picked.indexOf(id);
+  if (idx >= 0) { App.picked.splice(idx, 1); }
+  else {
+    if (App.picked.length >= 10) { toast('只能选10张底牌'); return; }
+    App.picked.push(id);
+  }
+  renderAll();
+};
+App.confirmPick = function () {
+  if (App.picked.length !== 10) { toast('请选满10张'); return; }
+  if (App.mode === 'local') {
+    const id = App.currentOperatorId;
+    App.localGame.choose(id, App.picked.slice());
+    // 自动切到下一位未完成的玩家
+    App.picked = [];
+    const next = App.localGame.players.find(p => p.status === 'choosing');
+    if (next) { App.currentOperatorId = next.id; }
+    renderAll();
+  } else {
+    sendOnline({ choose: { cardIds: App.picked.slice() } }); // placeholder
+  }
+};
+// 修正上面联机发送（避免发送错误结构）：
+App.confirmPick = function () {
+  if (App.picked.length !== 10) { toast('请选满10张'); return; }
+  if (App.mode === 'local') {
+    const id = App.currentOperatorId;
+    App.localGame.choose(id, App.picked.slice());
+    App.picked = [];
+    const next = App.localGame.players.find(p => p.status === 'choosing');
+    if (next) { App.currentOperatorId = next.id; }
+    renderAll();
+  } else {
+    sendOnline({ type: 'choose', cardIds: App.picked.slice() });
+    App.picked = [];
+  }
+};
+
+/* ---------- 挫折 ---------- */
+App.openAccept = function () {
+  App.acceptMode = 'accept';
+  App.acceptDiscard = null;
+  renderAll();
+};
+App.openRefuse = function () {
+  App.acceptMode = 'refuse';
+  App.pendingDiscards = [];
+  renderAll();
+};
+App.cancelDecision = function () {
+  App.acceptMode = null; App.acceptDiscard = null; App.pendingDiscards = [];
+  renderAll();
+};
+App.toggleAcceptDiscard = function (id) {
+  App.acceptDiscard = id;
+  renderAll();
+};
+App.toggleRefuseDiscard = function (id) {
+  const idx = App.pendingDiscards.indexOf(id);
+  if (idx >= 0) App.pendingDiscards.splice(idx, 1);
+  else {
+    if (App.pendingDiscards.length >= 2) { toast('只能选2张'); return; }
+    App.pendingDiscards.push(id);
+  }
+  renderAll();
+};
+App.sendAccept = function () {
+  if (!App.acceptDiscard) { toast('请选择要放弃的底牌'); return; }
+  if (App.mode === 'local') {
+    App.localGame.accept(App.currentOperatorId, App.acceptDiscard);
+  } else {
+    sendOnline({ type: 'accept', discardId: App.acceptDiscard });
+  }
+  App.acceptMode = null; App.acceptDiscard = null; App.pendingDiscards = [];
+  if (App.mode === 'local') {
+    const next = App.localGame.players.find(p => p.status === 'deciding');
+    if (next) App.currentOperatorId = next.id;
+  }
+  renderAll();
+};
+App.sendRefuse = function () {
+  if (App.pendingDiscards.length !== 2) { toast('请选2张底牌'); return; }
+  if (App.mode === 'local') {
+    App.localGame.refuse(App.currentOperatorId, App.pendingDiscards.slice());
+  } else {
+    sendOnline({ type: 'refuse', discardIds: App.pendingDiscards.slice() });
+  }
+  App.acceptMode = null; App.acceptDiscard = null; App.pendingDiscards = [];
+  if (App.mode === 'local') {
+    const next = App.localGame.players.find(p => p.status === 'deciding');
+    if (next) App.currentOperatorId = next.id;
+  }
+  renderAll();
+};
+
+App.restartGame = function () {
+  if (App.mode === 'local') {
+    App.picked = []; App.acceptMode = null; App.acceptDiscard = null; App.pendingDiscards = [];
+    App.localGame.restart();
+    App.currentOperatorId = App.localGame.players[0].id;
+    renderAll();
+  } else {
+    sendOnline({ type: 'restart' });
+  }
+};
+
+/* ==================================================================== */
+/* 初始化                                                                  */
+/* ==================================================================== */
+App.onlineConnected = false;
+renderAll();
+</script>
+</body>
+</html>
